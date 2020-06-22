@@ -182,7 +182,7 @@ namespace Matcher
                     unBlockElems();
                 }
 
-                if (!oneFile)
+                if (!oneFile && dirCompare.Count != 0)
                 {
                     dirCount(); // запись директорий с количеством повторений,
                     countOut(); // вывод количества совпадений в папках
@@ -209,7 +209,17 @@ namespace Matcher
                     }
                 }
                 infoRef.Content = "Папка " + directories[num].NameDir;
-                infoDir.Content = "имеет " + directories[num].Cnt + " совпадений файлов.";
+                infoDir.Content = "имеет " + directories[num].Cnt + " совпадений файлов из " + listRefers.Count;
+
+                for (int i = 0; i < dirCompare.Count; i++)
+                {
+                    if (dirCompare[i].Dir.Equals(directories[num].NameDir))
+                    { 
+                        dataTable2.SelectedItem = dataTable2.Items[i];
+                        dataTable2.ScrollIntoView(dataTable2.Items[i]);
+                        break;
+                    }
+                }
             }
         }
 
@@ -277,7 +287,7 @@ namespace Matcher
                     {
                         if (listRefers[i].Size.Equals(matchesLists[j].Size) && content)
                         {
-                            if (matchingBytes(listRefers[i].ID, matchesLists[j].ID))
+                            if (matchingBytes(i, j))
                             {
                                 dirCompare.Add(matchesLists[j]);
                                 dirCompare[dirCompare.Count - 1].ID = referCompare[referCompare.Count - 1].ID;
@@ -405,6 +415,8 @@ namespace Matcher
             dirCompare.Clear();
             bindListRefer.Clear();
             bindMatches.Clear();
+            infoDir.Content = "";
+            infoRef.Content = "";
         }
 
         // метод сбора файлов в папке номер 2
