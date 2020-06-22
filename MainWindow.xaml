@@ -1,0 +1,66 @@
+﻿<Window x:Class="Matcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Matcher"
+        mc:Ignorable="d"
+        Title="File Matcher" Height="650" Width="1300" Icon="iconF.png" MinWidth="1250" MinHeight="650">
+    <Grid>
+
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FFC8EBFB" Offset="0"/>
+                <GradientStop Color="#FFCDFFB6" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="45"></RowDefinition>
+            <RowDefinition Height="45"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="59"></RowDefinition>
+        </Grid.RowDefinitions>
+        <WrapPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" Orientation="Horizontal">
+            <Label Content="Файлы - образцы" FontSize="16" Height="31" Width="138" HorizontalAlignment="Left" Margin="25, 7"/>
+            <Button x:Name="btnRefer" Content="Выбрать" HorizontalAlignment="Center" Margin="25, 7"  Width="76" FontSize="16" Click="btnRefer_Click" RenderTransformOrigin="1.849,-0.18" Height="25"/>
+            <CheckBox x:Name="chckOneFile" Content="Только один файл" HorizontalAlignment="Right" Margin="25, 7" FontSize="16" Height="22" Click="chckOneFile_Click" Width="154"/>
+        </WrapPanel>
+        <WrapPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Label Content="Папка, где искать" HorizontalAlignment="Left" FontSize="16" Height="31" Width="138" Margin="25, 7"/>
+            <Button x:Name="btnDir" Content="Выбрать" Width="76" FontSize="16" Click="btnDir_Click" Height="25" Margin="25, 7"/>
+            <CheckBox x:Name="checkContent" Content="По содержимому" Margin="27, 11" HorizontalAlignment="Right" FontSize="16" Click="checkContent_Click"/>
+        </WrapPanel>
+        <TextBox x:Name="Refer" Grid.Row="1" Grid.Column="0" Height="24" TextWrapping="Wrap" Margin="22, 0"/>
+        <TextBox x:Name="dirFolder" Grid.Row="1" Grid.Column="1" Height="24" TextWrapping="Wrap" Margin="22, 0"/>
+        <WrapPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="delSettings" Content="Удалить настройки" Margin="27, 7" FontSize="16" Height="34" Background="#FFFFECDA" MinWidth="163" Width="164" MinHeight="33" Click="delSettings_Click"/>
+            <Label x:Name="infoRef" HorizontalAlignment="Left" Margin="22, 7" VerticalAlignment="Center" Width="350" FontSize="14" HorizontalContentAlignment="Right"/>
+        </WrapPanel>
+        <WrapPanel Grid.Row="3" Grid.Column="1">
+            <Label x:Name="infoDir" HorizontalAlignment="Left" Margin="22, 7" VerticalAlignment="Center" Width="350" FontSize="14"/>
+            <Button x:Name="startMatching" Content="Начать поиск" FontSize="16" Height="34" Margin="22, 7" Background="#FF8DF3C9" MinWidth="163" Width="164" MinHeight="33" Click="startMatching_Click"/>
+        </WrapPanel>
+        <DataGrid x:Name="dataTabel1" Grid.Row="2" Grid.Column="0" Margin="11" AutoGenerateColumns="False" FontSize="14">
+            <DataGrid.Columns>
+                <!--<DataGridCheckBoxColumn Binding="{Binding Path=Check}" Width="25" IsReadOnly="False"/>-->
+                <DataGridTextColumn Header="№" Binding="{Binding Path=ID}" Width="25" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Файл" Binding="{Binding Path=Name}" Width="*" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="dataTable2" Grid.Row="2" Grid.Column="1" Margin="11" AutoGenerateColumns="False" SelectionChanged="dataTable2_SelectionChanged" MouseDoubleClick="dataTable2_MouseDoubleClick" FontSize="14">
+            <DataGrid.Columns>
+                <!--<DataGridCheckBoxColumn Binding="{Binding Path=Check}" Width="25" IsReadOnly="False"/>-->
+                <DataGridTextColumn Header="№" Binding="{Binding Path=ID}" Width="25" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Файл" Width="*" Binding="{Binding Path=FullName}" IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <!--<CheckBox x:Name="checkAllRefer" Content="" HorizontalAlignment="Left" Margin="18,16,0,0" Grid.Row="2" VerticalAlignment="Top"/>-->
+        <!--<CheckBox x:Name="checkAllDir" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="19,16,0,0" Grid.Row="2" VerticalAlignment="Top"/>-->
+
+
+    </Grid>
+</Window>

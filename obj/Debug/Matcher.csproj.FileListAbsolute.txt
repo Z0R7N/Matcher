@@ -1,0 +1,15 @@
+D:\CCodePrjcts\Matcher\bin\Debug\Matcher.exe.config
+D:\CCodePrjcts\Matcher\bin\Debug\Matcher.exe
+D:\CCodePrjcts\Matcher\bin\Debug\Matcher.pdb
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher.csprojAssemblyReference.cache
+D:\CCodePrjcts\Matcher\obj\Debug\MainWindow.g.cs
+D:\CCodePrjcts\Matcher\obj\Debug\App.g.cs
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher_MarkupCompile.cache
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher_MarkupCompile.lref
+D:\CCodePrjcts\Matcher\obj\Debug\MainWindow.baml
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher.g.resources
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher.Properties.Resources.resources
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher.csproj.GenerateResource.cache
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher.csproj.CoreCompileInputs.cache
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher.exe
+D:\CCodePrjcts\Matcher\obj\Debug\Matcher.pdb
