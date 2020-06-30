@@ -12,3 +12,4 @@ D:\CCodePrjcts\Matcher\obj\Release\Matcher.csproj.GenerateResource.cache
 D:\CCodePrjcts\Matcher\obj\Release\Matcher.csproj.CoreCompileInputs.cache
 D:\CCodePrjcts\Matcher\obj\Release\Matcher.exe
 D:\CCodePrjcts\Matcher\obj\Release\Matcher.pdb
+D:\CCodePrjcts\Matcher\obj\Release\Matcher.csprojAssemblyReference.cache
