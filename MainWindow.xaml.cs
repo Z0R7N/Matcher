@@ -160,8 +160,7 @@ namespace Matcher
             if (matching)
             {
                 matching = false;
-                clearLists();
-                unBlockElems();
+                new Thread(() => endOfPrg()).Start();
             }
             else
             {
@@ -180,46 +179,30 @@ namespace Matcher
                 new Thread(() => dirReference()).Start();
                 Thread.Sleep(3);
 
-                if (matching)
-                {
-                    // получение файлов из второй папки
-                    new Thread(() => FileSearchFunction(dirTarget)).Start();
-                    Thread.Sleep(3);
-                }
+                // получение файлов из второй папки
+                new Thread(() => FileSearchFunction(dirTarget)).Start();
+                Thread.Sleep(3);
 
-                if (matching)
-                {
-                    // сравнение файлов в папках
-                    new Thread(() => filesCompare()).Start();
-                    Thread.Sleep(3);
-                }
+                // сравнение файлов в папках
+                new Thread(() => filesCompare()).Start();
+                Thread.Sleep(3);
 
-                if (matching)
-                {
-                    // заполнение первой таблицы
-                    new Thread(() => fillTableLeft()).Start();
-                    Thread.Sleep(3);
-                }
+                // заполнение первой таблицы
+                new Thread(() => fillTableLeft()).Start();
+                Thread.Sleep(3);
 
-                if (matching)
-                {
-                    // заполнение второй таблицы
-                    new Thread(() => fillTableRight()).Start();
-                    Thread.Sleep(4);
-                }
+                // заполнение второй таблицы
+                new Thread(() => fillTableRight()).Start();
+                Thread.Sleep(4);
 
+                // запись директорий с количеством повторений
+                new Thread(() => dirCount()).Start();
 
-                if (!oneFile && dirCompare.Count != 0 && matching)
-                {
-                    // запись директорий с количеством повторений
-                    new Thread(() => dirCount()).Start();
+                // вывод количества совпадений в папках
+                new Thread(() => countOut()).Start();
+                Thread.Sleep(3);
 
-                    // вывод количества совпадений в папках
-                    new Thread(() => countOut()).Start();
-                    Thread.Sleep(3);
-                }
-                //new Thread(()=> unBlockElems()).Start();
-                //matching = false;
+                // завершение, разблокировка элементов и matching = false
                 new Thread(() => endOfPrg()).Start();
             }
         }
@@ -231,7 +214,6 @@ namespace Matcher
             {
                 unBlockElems();
                 matching = false;
-                Debug.WriteLine("10 - запуск разблокировки и отмена работы программы");
             }
         }
 
@@ -240,41 +222,42 @@ namespace Matcher
         {
             lock (o)
             {
-                if (directories.Count != 0)
+                if (!oneFile && dirCompare.Count != 0 && matching)
                 {
-                    int max = 0;
-                    int num = 0;
-                    for (int i = 0; i < directories.Count; i++)
+                    if (directories.Count != 0)
                     {
-                        if (max < directories[i].Cnt)
+                        int max = 0;
+                        int num = 0;
+                        for (int i = 0; i < directories.Count; i++)
                         {
-                            max = directories[i].Cnt;
-                            num = i;
-                        }
-                    }
-                    this.Dispatcher.Invoke(new Action(() =>
-                    {
-                        infoRef.Content = "Папка " + directories[num].NameDir;
-                        infoDir.Content = "имеет " + directories[num].Cnt + " совпадений файлов из " + listRefers.Count;
-
-                    }));
-
-
-                    for (int i = 0; i < dirCompare.Count; i++)
-                    {
-                        if (dirCompare[i].Dir.Equals(directories[num].NameDir))
-                        {
-                            this.Dispatcher.Invoke(new Action(() =>
+                            if (max < directories[i].Cnt)
                             {
-                                dataTable2.SelectedItem = dataTable2.Items[i];
-                                dataTable2.ScrollIntoView(dataTable2.Items[i]);
-                            }));
-                            break;
+                                max = directories[i].Cnt;
+                                num = i;
+                            }
+                        }
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            infoRef.Content = "Папка " + directories[num].NameDir;
+                            infoDir.Content = "имеет " + directories[num].Cnt + " совпадений файлов из " + listRefers.Count;
+
+                        }));
+
+
+                        for (int i = 0; i < dirCompare.Count; i++)
+                        {
+                            if (dirCompare[i].Dir.Equals(directories[num].NameDir))
+                            {
+                                this.Dispatcher.Invoke(new Action(() =>
+                                {
+                                    dataTable2.SelectedItem = dataTable2.Items[i];
+                                    dataTable2.ScrollIntoView(dataTable2.Items[i]);
+                                }));
+                                break;
+                            }
                         }
                     }
                 }
-                Debug.WriteLine("8 - после вывода количества совпадающих директорий, matching: " + matching);
-                //Thread.Sleep(6000);
             }
         }
 
@@ -283,30 +266,30 @@ namespace Matcher
         {
             lock (o)
             {
-                Directories dirD = new Directories(dirCompare[0].Dir, 1);
-                directories.Add(dirD);
-                for (int i = 1; i < dirCompare.Count; i++)
+                if (!oneFile && dirCompare.Count != 0 && matching)
                 {
-                    bool yes = true;
-                    string d = dirCompare[i].Dir;
-                    dirD = new Directories(d, 1);
-                    for (int j = 0; j < directories.Count; j++)
+                    Directories dirD = new Directories(dirCompare[0].Dir, 1);
+                    directories.Add(dirD);
+                    for (int i = 1; i < dirCompare.Count; i++)
                     {
-                        if (directories[j].NameDir.Equals(d))
+                        bool yes = true;
+                        string d = dirCompare[i].Dir;
+                        dirD = new Directories(d, 1);
+                        for (int j = 0; j < directories.Count; j++)
                         {
-                            directories[j].Cnt++;
-                            yes = false;
-                            break;
+                            if (directories[j].NameDir.Equals(d))
+                            {
+                                directories[j].Cnt++;
+                                yes = false;
+                                break;
+                            }
+                        }
+                        if (yes)
+                        {
+                            directories.Add(dirD);
                         }
                     }
-                    if (yes)
-                    {
-                        directories.Add(dirD);
-                    }
                 }
-                Debug.WriteLine("7 - после сравнения директорий, matching: " + matching);
-                Debug.WriteLine("7 - количество файлов в directories = " + directories.Count);
-                Thread.Sleep(6000);
             }
         }
 
@@ -315,19 +298,20 @@ namespace Matcher
         {
             lock (o)
             {
-                for (int i = 0; i < listRefers.Count; i++)
+                if (matching)
                 {
+                    for (int i = 0; i < listRefers.Count; i++)
+                    {
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            bindListRefer.Add(listRefers[i]);
+                        }));
+                    }
                     this.Dispatcher.Invoke(new Action(() =>
                     {
-                        bindListRefer.Add(listRefers[i]);
+                        dataTabel1.ItemsSource = bindListRefer;
                     }));
                 }
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    dataTabel1.ItemsSource = bindListRefer;
-                }));
-                Debug.WriteLine("5 - после заполнения таблицы 1, matching: " + matching);
-                //Thread.Sleep(6000);
             }
         }
 
@@ -336,16 +320,20 @@ namespace Matcher
         {
             lock (o)
             {
-                for (int i = 0; i < dirCompare.Count; i++)
+                if (matching)
                 {
-                    bindMatches.Add(dirCompare[i]);
+                    for (int i = 0; i < dirCompare.Count; i++)
+                    {
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            bindMatches.Add(dirCompare[i]);
+                        }));
+                    }
+                    this.Dispatcher.Invoke(new Action(() =>
+                    {
+                        dataTable2.ItemsSource = bindMatches;
+                    }));
                 }
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    dataTable2.ItemsSource = bindMatches;
-                }));
-                Debug.WriteLine("6 - после заполнения таблицы 2, matching: " + matching);
-                //Thread.Sleep(6000);
             }
         }
 
@@ -354,42 +342,52 @@ namespace Matcher
         {
             lock (o)
             {
-                for (int i = 0; i < listRefers.Count; i++)
+                if (matching)
                 {
-                    referCompare.Add(listRefers[i]);
-                    for (int j = 0; j < matchesLists.Count; j++)
+                    for (int i = 0; i < listRefers.Count; i++)
                     {
-                        if (listRefers[i].Name.Equals(matchesLists[j].Name))
+                        referCompare.Add(listRefers[i]);
+                        for (int j = 0; j < matchesLists.Count; j++)
                         {
-                            dirCompare.Add(matchesLists[j]);
-                            dirCompare[dirCompare.Count - 1].ID = referCompare[referCompare.Count - 1].ID;
-                            //Debug.WriteLine(listRefers[i].Name + " = name = " + matchesLists[j].FullName);
-                        }
-                        else
-                        {
-                            if (listRefers[i].Size.Equals(matchesLists[j].Size) && content)
+                            if (listRefers[i].Name.Equals(matchesLists[j].Name))
                             {
-                                if (matchingBytes(i, j))
+                                if (matching)
                                 {
                                     dirCompare.Add(matchesLists[j]);
                                     dirCompare[dirCompare.Count - 1].ID = referCompare[referCompare.Count - 1].ID;
-                                    //Debug.WriteLine(listRefers[i].Name + " = size = " + matchesLists[j].FullName);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (listRefers[i].Size.Equals(matchesLists[j].Size) && content)
+                                {
+                                    if (matchingBytes(i, j))
+                                    {
+                                        if (matching)
+                                        {
+                                            dirCompare.Add(matchesLists[j]);
+                                            dirCompare[dirCompare.Count - 1].ID = referCompare[referCompare.Count - 1].ID;
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                Debug.WriteLine("4 - после сравнения файлов, matching: " + matching);
-                //Debug.WriteLine("длина списка совпадения файлов = " + dirCompare.Count);
-                //Thread.Sleep(6000);
             }
         }
 
         // метод сравнения файлов побайтово
         private bool matchingBytes(int a, int b)
         {
-            Debug.WriteLine("побайтово a = " + alRef[a].FullName);
-            Debug.WriteLine("побайтово b = " + all[b].FullName);
             int filebit1, filebit2;
             bool res = true;
             FileStream fs1, fs2;
@@ -431,9 +429,6 @@ namespace Matcher
                     btnRefer.IsEnabled = true;
                     btnDir.IsEnabled = true;
                 }));
-
-                Debug.WriteLine("9 - unblock elems, matching: " + matching);
-                //Thread.Sleep(6000);
             }
         }
 
@@ -442,50 +437,53 @@ namespace Matcher
         {
             lock (o)
             {
-                this.Dispatcher.Invoke(() =>
+                if (matching)
                 {
-                    if (oneFile)
+                    this.Dispatcher.Invoke(() =>
                     {
-                        try
+                        if (oneFile)
                         {
-                            FileInfo fi = new FileInfo(referenceFile);
-                            alRef.Add(fi);
-                            ListRefer lf = new ListRefer(fi.Name, 0, fi.Length, false);
-                            listRefers.Add(lf);
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine("error: " + e);
-                            Refer.Text = "Что-то здесь не то...";
-                            matching = false;
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            System.IO.DirectoryInfo DI = new System.IO.DirectoryInfo(dirRefer);
-                            int cnt = 0;
-                            foreach (FileInfo ff in DI.GetFiles())
+                            try
                             {
-                                alRef.Add(ff);
-                                ListRefer lr = new ListRefer(ff.Name, cnt, ff.Length, false);
-                                listRefers.Add(lr);
-                                cnt++;
+                                FileInfo fi = new FileInfo(referenceFile);
+                                alRef.Add(fi);
+                                ListRefer lf = new ListRefer(fi.Name, 0, fi.Length, false);
+                                listRefers.Add(lf);
+                                Refer.Text = referenceFile;
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("error: " + e);
+                                Refer.Text = "Что-то здесь не то...";
+                                matching = false;
+                                return;
                             }
                         }
-                        catch (Exception e)
+                        else
                         {
-                            Debug.WriteLine("error: " + e);
-                            Refer.Text = "Что-то здесь не то...";
-                            matching = false;
-                            return;
+                            try
+                            {
+                                System.IO.DirectoryInfo DI = new System.IO.DirectoryInfo(dirRefer);
+                                int cnt = 0;
+                                foreach (FileInfo ff in DI.GetFiles())
+                                {
+                                    alRef.Add(ff);
+                                    ListRefer lr = new ListRefer(ff.Name, cnt, ff.Length, false);
+                                    listRefers.Add(lr);
+                                    cnt++;
+                                }
+                                Refer.Text = referenceFile;
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("error: " + e);
+                                Refer.Text = "Что-то здесь не то...";
+                                matching = false;
+                                return;
+                            }
                         }
-                    }
-                });
-                Debug.WriteLine("2 - после сбора файлов в папку 1, matching: " + matching);
-                Debug.WriteLine("2 - длина списка папки 1 = " + alRef.Count);
+                    });
+                }
             }
         }
 
@@ -494,10 +492,8 @@ namespace Matcher
         {
             lock (o)
             {
-                Debug.WriteLine("1 - блокировка элементов, matching: " + matching);
                 this.Dispatcher.Invoke(() =>
                 {
-                    Debug.WriteLine("1 - блокировка элементов, matching: " + matching);
                     startMatching.Content = "Остановить поиск";
                     startMatching.Background = new SolidColorBrush(Color.FromRgb(250, 128, 114));
                     chckOneFile.IsEnabled = false;
@@ -508,7 +504,6 @@ namespace Matcher
                     checkContent.IsEnabled = false;
                     btnDir.IsEnabled = false;
                 });
-                Debug.WriteLine("1 - блокировка элементов, matching: " + matching);
             }
         }
 
@@ -526,7 +521,6 @@ namespace Matcher
             bindMatches.Clear();
             infoDir.Content = "";
             infoRef.Content = "";
-            Debug.WriteLine("0 - очистка списков");
         }
 
         // метод сбора файлов в папке номер 2
@@ -534,45 +528,49 @@ namespace Matcher
         {
             lock (o)
             {
-                try
+                if (matching)
                 {
-                    int cnt = 0;
-                    System.IO.DirectoryInfo DI = new System.IO.DirectoryInfo(Dir);
-                    System.IO.DirectoryInfo[] SubDir = DI.GetDirectories();
-                    for (int i = 0; i < SubDir.Length; ++i)
+                    try
                     {
-                        if (!matching)
+                        int cnt = 0;
+                        System.IO.DirectoryInfo DI = new System.IO.DirectoryInfo(Dir);
+                        System.IO.DirectoryInfo[] SubDir = DI.GetDirectories();
+                        for (int i = 0; i < SubDir.Length; ++i)
                         {
-                            break;
+                            if (!matching)
+                            {
+                                break;
+                            }
+                            this.FileSearchFunction(SubDir[i].FullName);
                         }
-                        this.FileSearchFunction(SubDir[i].FullName);
-                    }
-                    System.IO.FileInfo[] FI = DI.GetFiles();
-                    foreach (FileInfo f in FI)
-                    {
-                        if (!matching)
+                        System.IO.FileInfo[] FI = DI.GetFiles();
+                        foreach (FileInfo f in FI)
                         {
+                            if (!matching)
+                            {
 
-                            break;
+                                break;
+                            }
+                            all.Add(f);
+                            MatchesList mList = new MatchesList(f.Name, f.FullName, f.DirectoryName, cnt, f.Length, false);
+                            cnt++;
+                            matchesLists.Add(mList);
                         }
-                        all.Add(f);
-                        MatchesList mList = new MatchesList(f.Name, f.FullName, f.DirectoryName, cnt, f.Length, false);
-                        cnt++;
-                        matchesLists.Add(mList);
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            dirFolder.Text = Dir;
+                        }));
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine("error: " + e);
+                        matching = false;
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            dirFolder.Text = "Здесь что-то не то...";
+                        }));
                     }
                 }
-                catch (Exception e)
-                {
-                    Debug.WriteLine("error: " + e);
-                    matching = false;
-                    this.Dispatcher.Invoke(new Action(() =>
-                    {
-                        dirFolder.Text = "Здесь что-то не то...";
-                    }));
-                }
-                Debug.WriteLine("3 - матчинг = " + matching);
-                //Debug.WriteLine("длина списка all = " + all.Count);
-                Debug.WriteLine("3 - после сбора во вторую папку");
             }
         }
 
