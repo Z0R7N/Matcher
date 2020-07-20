@@ -160,6 +160,11 @@ namespace Matcher
             if (matching)
             {
                 matching = false;
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    startMatching.IsEnabled = false;
+                }));
+                Thread.Sleep(10);
                 new Thread(() => endOfPrg()).Start();
             }
             else
@@ -347,8 +352,16 @@ namespace Matcher
                     for (int i = 0; i < listRefers.Count; i++)
                     {
                         referCompare.Add(listRefers[i]);
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            infoRef.Content = listRefers[i].Name;
+                        }));
                         for (int j = 0; j < matchesLists.Count; j++)
                         {
+                            this.Dispatcher.Invoke(new Action(() =>
+                            {
+                                infoDir.Content = matchesLists[j].Name;
+                            }));
                             if (listRefers[i].Name.Equals(matchesLists[j].Name))
                             {
                                 if (matching)
@@ -382,6 +395,11 @@ namespace Matcher
                         }
                     }
                 }
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    infoDir.Content = "";
+                    infoRef.Content = "";
+                }));
             }
         }
 
@@ -396,7 +414,7 @@ namespace Matcher
             int cnt = 0;
             filebit1 = fs1.ReadByte();
             filebit2 = fs2.ReadByte();
-            while (cnt < 40000 && filebit1 != -1)
+            while (cnt < 300000000 && filebit1 != -1)
             {
                 cnt++;
                 if (filebit1 != filebit2)
@@ -428,6 +446,7 @@ namespace Matcher
                     delSettings.IsEnabled = true;
                     btnRefer.IsEnabled = true;
                     btnDir.IsEnabled = true;
+                    startMatching.IsEnabled = true;
                 }));
             }
         }
