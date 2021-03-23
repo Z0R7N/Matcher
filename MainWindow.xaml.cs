@@ -93,9 +93,9 @@ namespace Matcher
                 fileRefer = openFileDialog.SafeFileName;
                 Settings.Default["flRef"] = fileRefer;
                 Settings.Default.Save();
-                Regex reg = new Regex(fileRefer);
-                dirRefer = reg.Replace(referenceFile, "");
-                dirRefer = dirRefer.Substring(0, dirRefer.Length - 1);
+                //Regex reg = new Regex(referenceFile);
+                //dirRefer = Regex.Replace(referenceFile, fileRefer, "");
+                dirRefer = referenceFile.Substring(0, dirRefer.Length - (fileRefer.Length + 1));
                 Settings.Default["drRef"] = dirRefer;
                 Settings.Default.Save();
                 Refer.Text = referenceFile;
